@@ -1,0 +1,1094 @@
+@import "../../css/units.css";
+@import "../../css/colors.css";
+@import "../../css/z-index.css";
+
+.page-wrapper {
+    height: 100%;
+}
+
+.body-wrapper {
+    height: calc(100% - $menu-bar-height);
+    background-color: $ui-primary;
+}
+
+.body-wrapper * {
+    box-sizing: border-box;
+}
+
+.flex-wrapper {
+    display: flex;
+
+    /*
+        Make 2 columns:
+        a) for the blocks + workspace panes, and
+        b) for combined stage menu + stage + sprite/stage selectors
+    */
+    flex-direction: row;
+    height: 100%;
+
+    /*
+        Stop scrollbar popping in and out from scratch-blocks border issue
+        https://github.com/LLK/scratch-gui/issues/318
+    */
+    overflow-y: hidden;
+}
+
+.starter-guide {
+    position: relative;
+    z-index: 3;
+    margin: 0;
+    border-bottom: 1px solid $ui-black-transparent;
+    background: #f8fbff;
+}
+
+.starter-guide summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 2.1rem;
+    color: $text-primary;
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.82rem;
+}
+
+.starter-guide summary::-webkit-details-marker {
+    display: none;
+}
+
+.starter-guide summary span {
+    color: $looks-secondary;
+    font-weight: 700;
+}
+
+.starter-guide summary strong {
+    color: $text-primary-transparent;
+    font-weight: 600;
+}
+
+.starter-guide-content {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0 0.75rem 0.6rem;
+}
+
+.starter-guide-item {
+    display: flex;
+    align-items: stretch;
+    gap: 0.35rem;
+    min-width: 0;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 6px;
+    padding: 0.25rem;
+    background: $ui-white;
+    color: $text-primary;
+}
+
+.starter-guide-item:hover {
+    border-color: $looks-secondary;
+    background: #fff;
+}
+
+.starter-guide-launch {
+    display: grid;
+    flex: 1;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+        "num title time"
+        "num desc desc";
+    gap: 0.08rem 0.45rem;
+    min-width: 0;
+    border: 0;
+    padding: 0.2rem 0.25rem;
+    background: transparent;
+    color: $text-primary;
+    text-align: left;
+    cursor: pointer;
+}
+
+.starter-guide-launch span {
+    grid-area: num;
+    align-self: center;
+    color: $looks-secondary;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.starter-guide-launch strong {
+    grid-area: title;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.82rem;
+}
+
+.starter-guide-launch em {
+    grid-area: desc;
+    overflow: hidden;
+    color: $text-primary-transparent;
+    font-size: 0.74rem;
+    font-style: normal;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.starter-guide-launch small {
+    grid-area: time;
+    align-self: center;
+    color: $text-primary-transparent;
+    font-size: 0.68rem;
+    white-space: nowrap;
+}
+
+.starter-guide-complete {
+    flex: 0 0 auto;
+    align-self: center;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 4px;
+    padding: 0.28rem 0.4rem;
+    background: #f4fff7;
+    color: $looks-secondary;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.starter-guide-complete:disabled {
+    border-color: rgba(52, 168, 83, 0.35);
+    background: #ecfff1;
+    color: #248344;
+    cursor: default;
+}
+
+.is-starter-completed {
+    border-color: rgba(52, 168, 83, 0.45);
+    background: #fbfffc;
+}
+
+.starter-guide-achievement {
+    margin: -0.25rem 0.75rem 0.6rem;
+    border: 1px solid rgba(52, 168, 83, 0.28);
+    border-radius: 6px;
+    padding: 0.38rem 0.55rem;
+    background: #f4fff7;
+    color: #248344;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.starter-guide[open] + .flex-wrapper {
+    height: calc(100% - 5.4rem);
+}
+
+.starter-guide.has-starter-achievement[open] + .flex-wrapper {
+    height: calc(100% - 7.25rem);
+}
+
+.starter-guide:not([open]) + .flex-wrapper {
+    height: calc(100% - 2.1rem);
+}
+
+.editor-wrapper {
+    /*
+        This is carefully balanced--  the minimum width at which the GUI will be displayed is 1024px.
+        At that size, the stage pane is 408px wide, with $space of padding to each side.
+        However, we must also add the border width to the stage pane. All-in-all, the stage pane's final width is
+        408px + ($space + $stage-standard-border-width * 2) (one border & padding per left/right side).
+
+        @todo This is in place to prevent "doubling up" of horizontal scrollbars in narrow windows, but there are likely
+        much better ways to solve that (e.g. undo #2124, remove this flex-basis entirely). However, they run their own
+        risks of breaking things, so let's just leave this as-is for the time being.
+    */
+    flex-basis: calc(1024px - 408px - (($space + $stage-standard-border-width) * 2));
+    flex-grow: 1;
+    flex-shrink: 0;
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-list {
+    height: $stage-menu-height;
+    width: 250px; /* Match width of the toolbox */
+    display: flex;
+    align-items: flex-end;
+    flex-shrink: 0;
+
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    font-size: 0.80rem;
+
+    /* Overrides for react-tabs styling */
+    margin: 0 !important;
+    border-bottom: 0 !important;
+}
+
+.tab {
+    flex-grow: 1;
+    height: 80%;
+    margin-bottom: 0;
+
+    border-radius: 1rem 1rem 0 0;
+    border: 1px solid $ui-black-transparent;
+
+    padding: 0.125rem 1.25rem 0;
+    font-size: 0.75rem;
+
+    background-color: $ui-tertiary;
+    color: $text-primary-transparent;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    user-select: none;
+    white-space: nowrap;
+}
+
+[dir="ltr"] .tab {
+    margin-left: -0.5rem;
+}
+
+[dir="rtl"] .tab {
+    margin-right: -0.5rem;
+}
+
+[dir="ltr"] .tab:nth-of-type(1) {
+    margin-left: 0;
+}
+
+[dir="rtl"] .tab:nth-of-type(1) {
+    margin-right: 0;
+}
+
+/* Use z-indices to force left-on-top for tabs */
+.tab:nth-of-type(1) {
+    z-index: 3;
+}
+.tab:nth-of-type(2) {
+    z-index: 2;
+}
+.tab:nth-of-type(3) {
+    z-index: 1;
+}
+
+.tab:hover {
+  background-color: $ui-primary;
+}
+
+.tab.is-selected {
+    height: 90%;
+    color: $looks-secondary;
+    background-color: $ui-white;
+    z-index: 4; /* Make sure selected is always above */
+}
+
+.tab img {
+    width: 1.375rem;
+    filter: grayscale(100%);
+}
+
+[dir="ltr"] .tab img {
+    margin-right: 0.125rem;
+}
+
+[dir="rtl"] .tab img {
+    margin-left: 0.125rem;
+}
+
+/* mirror blocks and sound tab icons */
+[dir="rtl"] .tab:nth-of-type(1) img {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .tab:nth-of-type(3) img {
+    transform: scaleX(-1);
+}
+
+.tab.is-selected img {
+    filter: none;
+}
+
+/* Tab style overrides from react-tabs */
+.tab.is-selected:after {
+    display: none;
+}
+
+.tab.is-selected:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: $ui-black-transparent;
+}
+
+.tab.is-selected:focus:after {
+    display: none;
+}
+
+/* Body of the tabs */
+.tabs {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-panel {
+    position: relative;
+    flex-grow: 1;
+    display: none;
+}
+
+.tab-panel.is-selected {
+    display: flex;
+}
+
+.blocks-wrapper {
+    flex-grow: 1;
+    position: relative;
+}
+
+.stage-and-target-wrapper {
+    /*
+        Makes rows for children:
+          1) stage menu
+          2) stage
+          3) sprite/stage selectors
+        Only reason we need this, is so .targetWrapper, which holds the selectors,
+        goes to full vertical height of the window
+    */
+    display: flex;
+    flex-direction: column;
+    /* pad entire wrapper to the left and right; allow children to fill width */
+    padding-left: $space;
+    padding-right: $space;
+
+    /* this will only ever be as wide as the stage */
+    flex-basis: 0;
+}
+
+.target-wrapper {
+    display: flex;
+    flex-grow: 1;
+    flex-basis: 0;
+
+    padding-top: $space;
+    min-height: 0; /* this makes it work in Firefox */
+
+    /*
+        For making the sprite-selector a scrollable pane
+        @todo: Not working in Safari
+    */
+    /* TODO this also breaks the thermometer menu */
+    /* overflow: hidden; */
+}
+
+.extension-button-container {
+    width: 3.75rem;
+    height: 3.25rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: $z-index-extension-button;
+    background: $looks-secondary;
+
+    border: 1px solid $looks-secondary;
+    box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
+}
+
+$fade-out-distance: 15px;
+
+.extension-button-container:before {
+    content: "";
+    position: absolute;
+    top: calc(calc(-1 * $fade-out-distance) - 1px);
+    left: -1px;
+    background: linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.15));
+    height: $fade-out-distance;
+    width: calc(100% + 0.5px);
+}
+
+
+.extension-button {
+    background: none;
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.extension-button-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+[dir="rtl"] .extension-button-icon {
+    transform: scaleX(-1);
+}
+
+.extension-button > div {
+    margin-top: 0;
+}
+
+/* Sprite Selection Watermark */
+.watermark {
+    position: absolute;
+    top: 1.25rem;
+    pointer-events: none;
+}
+
+[dir="ltr"] .watermark {
+    right: 1.25rem;
+}
+
+[dir="rtl"] .watermark {
+    left: 1.25rem;
+}
+
+/* Menu */
+
+.menu-bar-position {
+    position: relative;
+    z-index: $z-index-menu-bar;
+}
+
+.auth-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    color: $text-primary;
+    background: #fff8e1;
+    border-top: 1px solid #ffe082;
+    border-bottom: 1px solid #ffe082;
+    padding: 0.4rem 0.8rem;
+}
+
+.auth-notice-error {
+    background: #ffebee;
+    border-color: #ffcdd2;
+    color: #b71c1c;
+}
+
+.auth-notice-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.auth-notice-button {
+    border: 1px solid #f9a825;
+    background: #fff;
+    color: #7c4d00;
+    border-radius: 6px;
+    padding: 0.1rem 0.5rem;
+    cursor: pointer;
+}
+
+.auth-notice-button:hover {
+    background: #fffde7;
+}
+
+.locked-experience {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: #edf6ff;
+}
+
+.locked-content {
+    width: 720px;
+    max-width: 100%;
+    padding: 2.4rem;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 8px;
+    background: $ui-white;
+    text-align: left;
+    box-shadow: 0 8px 24px $ui-black-transparent;
+}
+
+.locked-brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-align: left;
+}
+
+.locked-brand-logo,
+.zhimeng-brand-logo {
+    flex: 0 0 auto;
+    object-fit: contain;
+    border-radius: 8px;
+    background: $ui-white;
+    box-shadow: 0 4px 14px $ui-black-transparent;
+}
+
+.locked-brand-logo {
+    width: 72px;
+    height: 72px;
+}
+
+.locked-brand {
+    color: $text-primary;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.locked-brand-sub {
+    margin-top: 0.25rem;
+    color: $text-primary-transparent;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.locked-content h1 {
+    margin: 1.45rem 0 0.65rem;
+    font-size: 1.75rem;
+    color: $text-primary;
+    text-align: center;
+}
+
+.locked-content p {
+    margin: 0;
+    line-height: 1.6;
+    color: $text-primary-transparent;
+    text-align: center;
+}
+
+.locked-status {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    background: #fff8dd;
+    color: #6f4b00;
+    line-height: 1.5;
+}
+
+.locked-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+}
+
+.zhimeng-auth-modal,
+.zhimeng-billing-modal {
+    width: 440px;
+    max-height: calc(100vh - 4rem);
+    overflow: hidden;
+    background: $ui-white;
+}
+
+.zhimeng-billing-modal {
+    width: min(1120px, calc(100vw - 4rem));
+}
+
+.zhimeng-auth-modal {
+    width: 500px;
+}
+
+.zhimeng-modal-body {
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1.25rem;
+}
+
+.zhimeng-modal-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.zhimeng-modal-eyebrow {
+    margin-bottom: 0.25rem;
+    color: $looks-secondary;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.zhimeng-modal-description {
+    margin-top: 0.35rem;
+    color: $text-primary-transparent;
+    line-height: 1.5;
+}
+
+.billing-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 0.95rem;
+}
+
+.billing-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
+}
+
+.zhimeng-brand-logo {
+    width: 52px;
+    height: 52px;
+}
+
+.billing-status-pill {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    background: #fff8dd;
+    color: #7c4d00;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.billing-status-pill.is-active {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.zhimeng-login-form {
+    margin-top: 0;
+}
+
+.zhimeng-primary-button,
+.zhimeng-secondary-button,
+.zhimeng-text-button {
+    min-height: 2.25rem;
+    border-radius: 6px;
+    padding: 0 1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.zhimeng-primary-button {
+    border: 1px solid $looks-secondary;
+    background: $looks-secondary;
+    color: $ui-white;
+}
+
+.zhimeng-secondary-button {
+    border: 1px solid $looks-secondary;
+    background: $ui-white;
+    color: $looks-secondary;
+}
+
+.zhimeng-text-button {
+    margin-top: 0.75rem;
+    border: none;
+    background: transparent;
+    color: $looks-secondary;
+}
+
+.zhimeng-primary-button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.zhimeng-secondary-button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.zhimeng-error {
+    margin-top: 0.6rem;
+    padding: 0.6rem;
+    border-radius: 6px;
+    background: #ffebee;
+    color: #b71c1c;
+}
+
+.zhimeng-success {
+    padding: 0.6rem;
+    border-radius: 6px;
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.subscription-status,
+.order-summary {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.subscription-status > div,
+.order-summary > div:not(.qr-panel):not(.zhimeng-success):not(.zhimeng-error) {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 6px;
+    background: $ui-secondary;
+}
+
+.subscription-status > div > span,
+.order-summary > div > span {
+    color: $text-primary-transparent;
+}
+
+.subscription-status > div > strong,
+.order-summary > div > strong {
+    color: $text-primary;
+    text-align: right;
+    word-break: break-word;
+}
+
+.order-summary p {
+    margin: 0;
+    color: $text-primary-transparent;
+    line-height: 1.5;
+}
+
+.billing-checkout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.28fr);
+    gap: 0.75rem;
+    align-items: stretch;
+    min-width: 0;
+}
+
+.billing-progress-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 8px;
+    background: #f7fbff;
+}
+
+.payment-guide,
+.order-side-panel,
+.proof-panel,
+.plan-card {
+    min-width: 0;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 8px;
+    background: $ui-white;
+}
+
+.payment-guide {
+    padding: 0.85rem;
+}
+
+.payment-guide-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.payment-guide-label,
+.payment-note-box span,
+.order-meta span,
+.proof-section-title span {
+    color: $text-primary-transparent;
+}
+
+.payment-amount {
+    margin-top: 0.1rem;
+    color: $text-primary;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.payment-channel-badge {
+    border-radius: 999px;
+    padding: 0.3rem 0.65rem;
+    background: #e8f5e9;
+    color: #1b5e20;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.payment-channel-badge.is-alipay {
+    background: #e8f1ff;
+    color: #0d47a1;
+}
+
+.payment-channel-badge.is-bank {
+    background: #eef0f6;
+    color: #3d455f;
+}
+
+.payment-channel-badge.is-other {
+    background: #fff3e0;
+    color: #7c4d00;
+}
+
+.qr-panel {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.65rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: #f7fbff;
+}
+
+.qr-panel img {
+    width: 148px;
+    height: 148px;
+    object-fit: contain;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 8px;
+    background: $ui-white;
+}
+
+.qr-missing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 148px;
+    height: 148px;
+    border: 1px dashed $ui-black-transparent;
+    border-radius: 8px;
+    color: $text-primary-transparent;
+}
+
+.payment-note-box {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.65rem;
+    padding: 0.6rem;
+    border-radius: 6px;
+    background: #fff8dd;
+}
+
+.payment-note-box strong {
+    color: #6f4b00;
+    text-align: right;
+    word-break: break-word;
+}
+
+.payment-hint {
+    margin: 0.55rem 0 0;
+    color: $text-primary-transparent;
+    line-height: 1.45;
+}
+
+.order-side-panel {
+    padding: 0.85rem;
+}
+
+.order-steps {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.billing-progress-panel .order-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.order-step-done,
+.order-step-current,
+.order-step-muted {
+    border-radius: 6px;
+    padding: 0.48rem 0.62rem;
+    font-weight: 700;
+}
+
+.order-step-done {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.order-step-current {
+    background: #fff8dd;
+    color: #7c4d00;
+}
+
+.order-step-muted {
+    background: $ui-secondary;
+    color: $text-primary-transparent;
+}
+
+.order-meta {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.billing-progress-panel .order-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.35rem 0.85rem;
+    margin-top: 0;
+}
+
+.order-meta > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.billing-progress-panel .order-meta > div {
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.order-meta strong {
+    color: $text-primary;
+    text-align: right;
+    word-break: break-word;
+}
+
+.proof-panel {
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
+    padding: 0.85rem;
+}
+
+.proof-section-title {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.payment-proof-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    padding-top: 0.55rem;
+    border-top: 1px solid $ui-black-transparent;
+}
+
+.create-order-form {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.payment-proof-form label,
+.create-order-form label {
+    display: grid;
+    gap: 0.25rem;
+    color: $text-primary;
+}
+
+.payment-proof-form label span,
+.create-order-form label span {
+    color: $text-primary-transparent;
+    font-size: 0.82rem;
+}
+
+.payment-proof-form input,
+.payment-proof-form select,
+.payment-proof-form textarea,
+.create-order-form select {
+    box-sizing: border-box;
+    min-height: 2rem;
+    width: 100%;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 4px;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: $text-primary;
+    background: $ui-white;
+}
+
+.payment-proof-form textarea {
+    resize: vertical;
+}
+
+.payment-proof-form label:last-of-type {
+    grid-column: 1 / -1;
+}
+
+.billing-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.billing-actions button {
+    flex: 1 1 9rem;
+}
+
+.plan-intro {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.plan-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f7fbff;
+}
+
+.plan-name {
+    color: $text-primary;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.plan-card p {
+    margin: 0.35rem 0 0;
+    color: $text-primary-transparent;
+    line-height: 1.45;
+}
+
+.plan-price {
+    flex: 0 0 auto;
+    color: $looks-secondary;
+    font-weight: 700;
+}
+
+@media (max-width: 820px) {
+    .zhimeng-billing-modal {
+        width: calc(100vw - 2rem);
+    }
+
+    .billing-progress-panel,
+    .billing-progress-panel .order-steps,
+    .billing-checkout,
+    .payment-proof-form {
+        grid-template-columns: 1fr;
+    }
+
+    .billing-progress-panel .order-meta {
+        justify-content: flex-start;
+    }
+}
+/* Alerts */
+
+.alerts-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    z-index: $z-index-alerts;
+    position: absolute;
+    margin-top: 53px;
+    pointer-events: none;
+}
+
+/*
+    Make the (background) page not scrollable when modals are open
+    This CSS class is automatically added to the body when react-modal is open
+*/
+:global(.ReactModal__Body--open) {
+    overflow: hidden;
+}
