@@ -2,8 +2,8 @@
 
 - Package version: 1.0.0
 - Export source: git ref HEAD
-- Core repository commit: eca809abef4c0f05993df0167fb4a4ed532dcdcb
-- Export generated at: 2026-05-28T06:07:44.591Z
+- Core repository commit: a325d591546eaf1003a94f8a706adc0dc7715e90
+- Export generated at: 2026-05-28T06:09:46.963Z
 - Exported source inputs had uncommitted changes: no
 - Core working tree had any uncommitted changes: yes
 
